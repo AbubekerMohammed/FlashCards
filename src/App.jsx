@@ -21,12 +21,14 @@ const CARD_PAIRS = [
 { question: 'What is the top speed of the Hennessey Venom F5?', answer: '311 mph' },
 { question: 'What year did the Ferrari F40 debut?', answer: '1987' },
 { question: 'What is the name of the engine used in the Audi R8?', answer: 'V10' },
-{ question: 'Whihc iconic sports car manufacturer produces the Sesto Elemento?', answer: 'Lamborghini' },
+{ question: 'Which iconic sports car manufacturer produces the Sesto Elemento?', answer: 'Lamborghini' },
 ];
 
 function App() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [userGuess, setUserGuess] = useState("");
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const currentCard = CARD_PAIRS[currentCardIndex];
 
@@ -35,32 +37,52 @@ function App() {
   };
 
   const handleNextClick = () => {
-    setCurrentCardIndex(Math.floor(Math.random() * CARD_PAIRS.length));
+    setCurrentCardIndex((currentCardIndex + 1) % CARD_PAIRS.length);
     setShowAnswer(false);
+    setUserGuess("");
+    setIsCorrect(false);
   };
 
   const handlePrevClick = () => {
-    const prevIndex = (currentIndex - 1 + flashcardData.length) % flashcardData.length;
-    setCurrentIndex(prevIndex);
+    setCurrentCardIndex((currentCardIndex - 1 + CARD_PAIRS.length) % CARD_PAIRS.length);
     setShowAnswer(false);
+    setUserGuess("");
+    setIsCorrect(false);
   };
 
-  return (
-    <div className="container">
-      <h1>Sportscar Enthusiast</h1>
-      <h1>Let's see how much you know about sportscars</h1>
-      <h2>Total cards: {CARD_PAIRS.length}</h2>
-      <div className="card" onClick={handleCardClick}>
-        <div className="card-content">
-          <h2>{showAnswer ? currentCard.answer : currentCard.question}</h2>
-        </div>
-      </div>
-      <div className = "button-container">
-      <button onClick={handlePrevClick}>Previous</button>
-      <button onClick={handleNextClick}>Next</button>
-      </div>
-    </div>
-  );
-}
+  const handleInputChange = (event) => {
+    setUserGuess(event.target.value);
+  };
 
-export default App;
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsCorrect(userGuess.toLowerCase() === currentCard.answer.toLowerCase());
+  };
+  
+  return (
+  <div className="App">
+  <h1>Sportcar Enthusiast</h1>
+  <div className="card-container">
+  <div className="card" onClick={handleCardClick}>
+  <div className="card-question">{currentCard.question}</div>
+  {showAnswer && (
+  <div className="card-answer">{currentCard.answer}</div>
+  )}
+  </div>
+  </div>
+  <form onSubmit={handleSubmit}>
+  <label>
+  Guess:
+  <input type="text" value={userGuess} onChange={handleInputChange} />
+  </label>
+  <button type="submit">Submit</button>
+  </form>
+  {isCorrect && <p>Correct!</p>}
+  {userGuess && !isCorrect && <p>Incorrect. Try again.</p>}
+  <button onClick={handlePrevClick}>Previous</button>
+  <button onClick={handleNextClick}>Next</button>
+  </div>
+  );
+  }
+  
+  export default App;
